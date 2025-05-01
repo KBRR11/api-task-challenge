@@ -132,4 +132,4 @@ Se utilizó Express 5 en su versión beta por sus mejoras en el manejo de promes
 ## Endpoints de documentación
 
 - **API Docs**: [https://us-central1-atom-challenge-2025.cloudfunctions.net/apiV1/api-docs/swagger.json](https://us-central1-atom-challenge-2025.cloudfunctions.net/apiV1/api-docs/swagger.json)
-- **Health Check**: [https://us-central1-atom-challenge-2025.cloudfunctions.net/apiV1/health](https://us-central1-atom-challenge-2025.cloudfunctions.net/apiV1/health)
+- **Health Check**: [https://us-central1-atom-challenge-2025.cloudfunctions.net/apiV1/health](https://us-central1-atom-challenge-2025.cloudfunctions.net/apiV1/health) 
