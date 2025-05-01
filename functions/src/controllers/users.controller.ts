@@ -1,6 +1,8 @@
 import { Request, Response } from 'express';
 import { UserService } from '../services/user.service';
 import { CreateUserDto } from '../dtos/user.dto';
+import { handleError } from '../utils/error-handler';
+import { UserNotFoundException } from '../common/exceptions/custom-exceptions';
 
 export class UsersController {
   private userService: UserService;
@@ -32,14 +34,12 @@ export class UsersController {
       
       res.status(200).json({ user, exists: true });
     } catch (error) {
-      console.error('Error en findByEmail:', error);
-      const message = error instanceof Error ? error.message : 'Error desconocido';
-      res.status(500).json({ message: 'Error al buscar usuario', error: message });
+      handleError(error, res);
     }
   };
 
   /**
-   * Crea un nuevo usuario
+   * Crea un nuevo usuario y devuelve un token JWT
    * @param req Request con datos del usuario
    * @param res Response
    */
@@ -57,28 +57,32 @@ export class UsersController {
       const existingUser = await this.userService.findByEmail(email);
       
       if (existingUser) {
+        // Si el usuario ya existe, generamos un token para él
+        const token = this.userService.authenticateUser(email);
         res.status(409).json({ 
           message: 'Ya existe un usuario con este email',
-          user: existingUser 
+          user: existingUser,
+          token: (await token).token // Obtiene el token de la promesa
         });
         return;
       }
       
-      const newUser = await this.userService.createUser(createUserDto);
+      // Crear nuevo usuario y generar token
+      const { user, token } = await this.userService.createUser(createUserDto);
       
       res.status(201).json({
         message: 'Usuario creado exitosamente',
-        user: newUser
+        user,
+        token
       });
     } catch (error) {
-      console.error('Error en createUser:', error);
-      const message = error instanceof Error ? error.message : 'Error desconocido';
-      res.status(500).json({ message: 'Error al crear usuario', error: message });
+      handleError(error, res);
     }
   };
 
   /**
    * Busca un usuario por su email o lo crea si no existe
+   * Devuelve un token JWT en ambos casos
    * @param req Request con datos del usuario
    * @param res Response
    */
@@ -91,18 +95,50 @@ export class UsersController {
         return;
       }
       
-      const user = await this.userService.findOrCreateUser(email);
-      const isNewUser = !(await this.userService.findByEmail(email));
+      const { user, token, isNewUser } = await this.userService.findOrCreateUser(email);
       
       res.status(200).json({
         message: isNewUser ? 'Usuario creado exitosamente' : 'Usuario encontrado',
         user,
+        token,
         isNewUser
       });
     } catch (error) {
-      console.error('Error en findOrCreateUser:', error);
-      const message = error instanceof Error ? error.message : 'Error desconocido';
-      res.status(500).json({ message: 'Error al procesar la solicitud', error: message });
+      handleError(error, res);
+    }
+  };
+  
+  /**
+   * Autentica a un usuario existente y devuelve un token JWT
+   * @param req Request con email en body
+   * @param res Response
+   */
+  authenticateUser = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { email } = req.body;
+      
+      if (!email) {
+        res.status(400).json({ message: 'El email es requerido' });
+        return;
+      }
+      
+      try {
+        const { user, token } = await this.userService.authenticateUser(email);
+        
+        res.status(200).json({
+          message: 'Autenticación exitosa',
+          user,
+          token
+        });
+      } catch (error) {
+        // Si el usuario no existe, devolvemos un 404
+        if (error instanceof Error && error.message === 'Usuario no encontrado') {
+          throw new UserNotFoundException();
+        }
+        throw error;
+      }
+    } catch (error) {
+      handleError(error, res);
     }
   };
 }

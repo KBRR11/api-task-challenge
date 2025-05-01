@@ -58,6 +58,18 @@ usersRouter.get('/find', usersController.findByEmail);
  *     responses:
  *       201:
  *         description: Usuario creado exitosamente
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 user:
+ *                   type: object
+ *                 token:
+ *                   type: string
+ *                   description: JWT para autenticación
  *       409:
  *         description: Ya existe un usuario con este email
  *       400:
@@ -87,11 +99,66 @@ usersRouter.post('/', usersController.createUser);
  *     responses:
  *       200:
  *         description: Usuario encontrado o creado
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 user:
+ *                   type: object
+ *                 token:
+ *                   type: string
+ *                   description: JWT para autenticación
+ *                 isNewUser:
+ *                   type: boolean
  *       400:
  *         description: Datos de entrada inválidos
  *       500:
  *         description: Error del servidor
  */
 usersRouter.post('/find-or-create', usersController.findOrCreateUser);
+
+/**
+ * @swagger
+ * /api/users/authenticate:
+ *   post:
+ *     summary: Autentica a un usuario existente y devuelve un token JWT
+ *     tags: [Users]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email:
+ *                 type: string
+ *             required:
+ *               - email
+ *     responses:
+ *       200:
+ *         description: Autenticación exitosa
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 user:
+ *                   type: object
+ *                 token:
+ *                   type: string
+ *                   description: JWT para autenticación
+ *       404:
+ *         description: Usuario no encontrado
+ *       400:
+ *         description: Datos de entrada inválidos
+ *       500:
+ *         description: Error del servidor
+ */
+usersRouter.post('/authenticate', usersController.authenticateUser);
 
 export default usersRouter;

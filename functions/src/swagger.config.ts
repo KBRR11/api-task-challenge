@@ -1,5 +1,4 @@
 import swaggerJSDoc from 'swagger-jsdoc';
-// Nota: Debes instalar swaggerJSDoc usando npm i swagger-jsdoc swagger-ui-express --save
 
 const swaggerOptions = {
   definition: {
@@ -7,10 +6,10 @@ const swaggerOptions = {
     info: {
       title: 'API de Tareas',
       version: '1.0.0',
-      description: 'API para gestionar tareas de usuarios',
+      description: 'API para gestionar tareas de usuarios con autenticación JWT',
       contact: {
         name: 'Desarrollador',
-        url: 'https://github.com/KBRR11/tareas-app',
+        url: 'https://github.com/KBRR11/api-task-challenge',
       },
     },
     servers: [
@@ -19,11 +18,19 @@ const swaggerOptions = {
         description: 'Servidor de desarrollo',
       },
       {
-        url: 'https://tu-app-en-firebase.web.app',
+        url: 'https://us-central1-atom-challenge-2025.cloudfunctions.net/apiV1',
         description: 'Servidor de producción',
       },
     ],
     components: {
+      securitySchemes: {
+        BearerAuth: {
+          type: 'http',
+          scheme: 'bearer',
+          bearerFormat: 'JWT',
+          description: 'Ingresa tu token JWT con el formato: Bearer {token}'
+        }
+      },
       schemas: {
         User: {
           type: 'object',
@@ -123,6 +130,22 @@ const swaggerOptions = {
             },
           },
         },
+        AuthResponse: {
+          type: 'object',
+          properties: {
+            message: {
+              type: 'string',
+              description: 'Mensaje de respuesta',
+            },
+            user: {
+              $ref: '#/components/schemas/User',
+            },
+            token: {
+              type: 'string',
+              description: 'Token JWT para autenticación',
+            }
+          }
+        }
       },
     },
   },
