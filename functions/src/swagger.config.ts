@@ -1,0 +1,134 @@
+import swaggerJSDoc from 'swagger-jsdoc';
+// Nota: Debes instalar swaggerJSDoc usando npm i swagger-jsdoc swagger-ui-express --save
+
+const swaggerOptions = {
+  definition: {
+    openapi: '3.0.0',
+    info: {
+      title: 'API de Tareas',
+      version: '1.0.0',
+      description: 'API para gestionar tareas de usuarios',
+      contact: {
+        name: 'Desarrollador',
+        url: 'https://github.com/KBRR11/tareas-app',
+      },
+    },
+    servers: [
+      {
+        url: 'http://localhost:5001/atom-challenge-2025/us-central1/api',
+        description: 'Servidor de desarrollo',
+      },
+      {
+        url: 'https://tu-app-en-firebase.web.app',
+        description: 'Servidor de producción',
+      },
+    ],
+    components: {
+      schemas: {
+        User: {
+          type: 'object',
+          properties: {
+            id: {
+              type: 'string',
+              description: 'ID único del usuario',
+            },
+            email: {
+              type: 'string',
+              description: 'Correo electrónico del usuario',
+            },
+            createdAt: {
+              type: 'string',
+              format: 'date-time',
+              description: 'Fecha de creación del usuario',
+            },
+          },
+        },
+        Task: {
+          type: 'object',
+          properties: {
+            id: {
+              type: 'string',
+              description: 'ID único de la tarea',
+            },
+            title: {
+              type: 'string',
+              description: 'Título de la tarea',
+            },
+            description: {
+              type: 'string',
+              description: 'Descripción detallada de la tarea',
+            },
+            completed: {
+              type: 'boolean',
+              description: 'Estado de completado de la tarea',
+            },
+            userId: {
+              type: 'string',
+              description: 'ID del usuario propietario de la tarea',
+            },
+            createdAt: {
+              type: 'string',
+              format: 'date-time',
+              description: 'Fecha de creación de la tarea',
+            },
+          },
+        },
+        CreateUserDto: {
+          type: 'object',
+          required: ['email'],
+          properties: {
+            email: {
+              type: 'string',
+              description: 'Correo electrónico del usuario',
+            },
+          },
+        },
+        CreateTaskDto: {
+          type: 'object',
+          required: ['title', 'userId'],
+          properties: {
+            title: {
+              type: 'string',
+              description: 'Título de la tarea',
+            },
+            description: {
+              type: 'string',
+              description: 'Descripción detallada de la tarea',
+            },
+            userId: {
+              type: 'string',
+              description: 'ID del usuario propietario de la tarea',
+            },
+          },
+        },
+        UpdateTaskDto: {
+          type: 'object',
+          required: ['userId'],
+          properties: {
+            title: {
+              type: 'string',
+              description: 'Título actualizado de la tarea',
+            },
+            description: {
+              type: 'string',
+              description: 'Descripción actualizada de la tarea',
+            },
+            completed: {
+              type: 'boolean',
+              description: 'Estado actualizado de completado',
+            },
+            userId: {
+              type: 'string',
+              description: 'ID del usuario propietario (para verificación)',
+            },
+          },
+        },
+      },
+    },
+  },
+  apis: ['./src/routes/*.ts'], // Paths to files containing OpenAPI definitions
+};
+
+const swaggerSpec = swaggerJSDoc(swaggerOptions);
+
+export default swaggerSpec;
