@@ -10,7 +10,7 @@ tasksRouter.use(authMiddleware);
 
 /**
  * @swagger
- * /api/tasks/user:
+ * /tasks/user:
  *   get:
  *     summary: Obtiene todas las tareas de un usuario
  *     tags: [Tasks]
@@ -30,7 +30,7 @@ tasksRouter.get('/user', tasksController.getAllTasksByUserId);
 
 /**
  * @swagger
- * /api/tasks/{id}:
+ * /tasks/{id}:
  *   get:
  *     summary: Obtiene una tarea por su ID
  *     tags: [Tasks]
@@ -59,7 +59,7 @@ tasksRouter.get('/:id', tasksController.getTaskById);
 
 /**
  * @swagger
- * /api/tasks:
+ * /tasks:
  *   post:
  *     summary: Crea una nueva tarea
  *     tags: [Tasks]
@@ -95,7 +95,7 @@ tasksRouter.post('/', tasksController.createTask);
 
 /**
  * @swagger
- * /api/tasks/{id}:
+ * /tasks/{id}:
  *   put:
  *     summary: Actualiza una tarea existente
  *     tags: [Tasks]
@@ -141,7 +141,7 @@ tasksRouter.put('/:id', tasksController.updateTask);
 
 /**
  * @swagger
- * /api/tasks/{id}:
+ * /tasks/{id}:
  *   delete:
  *     summary: Elimina una tarea
  *     tags: [Tasks]
@@ -181,7 +181,7 @@ tasksRouter.delete('/:id', tasksController.deleteTask);
 
 /**
  * @swagger
- * /api/tasks/{id}/toggle-completion:
+ * /tasks/{id}/toggle-completion:
  *   patch:
  *     summary: Marca una tarea como completada o pendiente
  *     tags: [Tasks]

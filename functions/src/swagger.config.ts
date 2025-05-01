@@ -14,7 +14,7 @@ const swaggerOptions = {
     },
     servers: [
       {
-        url: 'http://localhost:5001/atom-challenge-2025/us-central1/api',
+        url: 'http://localhost:5001/atom-challenge-2025/us-central1/apiV1',
         description: 'Servidor de desarrollo',
       },
       {

@@ -10,7 +10,7 @@ import tasksRouter  from './routes/tasks.route';
 const app:Express = express();
 
 // Middlewares
-app.use(helmet()); // Seguridad
+app.use(helmet({contentSecurityPolicy: false})); // Seguridad
 app.use(cors()); // Permitir CORS
 app.use(express.json()); // Parsear JSON
 
@@ -22,12 +22,12 @@ app.use('/tasks', tasksRouter);
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
     explorer: true,
     swaggerOptions: {
-        url: '/swagger.json',
-    },
+      persistAuthorization: true 
+    }
   }));
 
 // Ruta para obtener el archivo de especificación swagger.json
-app.get('/swagger.json', (req, res) => {
+app.get('/api-docs/swagger.json', (req, res) => {
   res.setHeader('Content-Type', 'application/json');
   res.send(swaggerSpec);
 });

@@ -6,7 +6,7 @@ const usersController = new UsersController();
 
 /**
  * @swagger
- * /api/users/find:
+ * /users/find:
  *   get:
  *     summary: Busca un usuario por su email
  *     tags: [Users]
@@ -40,7 +40,7 @@ usersRouter.get('/find', usersController.findByEmail);
 
 /**
  * @swagger
- * /api/users:
+ * /users:
  *   post:
  *     summary: Crea un nuevo usuario
  *     tags: [Users]
@@ -81,7 +81,7 @@ usersRouter.post('/', usersController.createUser);
 
 /**
  * @swagger
- * /api/users/find-or-create:
+ * /users/find-or-create:
  *   post:
  *     summary: Busca un usuario por su email o lo crea si no existe
  *     tags: [Users]
@@ -122,7 +122,7 @@ usersRouter.post('/find-or-create', usersController.findOrCreateUser);
 
 /**
  * @swagger
- * /api/users/authenticate:
+ * /users/authenticate:
  *   post:
  *     summary: Autentica a un usuario existente y devuelve un token JWT
  *     tags: [Users]
