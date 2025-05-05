@@ -7,6 +7,13 @@ import {Timestamp} from "firebase-admin/firestore";
 // Mock del repositorio de usuarios
 jest.mock("../../src/repositories/user.repository");
 
+// Mock del módulo JWT para evitar generar tokens reales en las pruebas
+jest.mock("../../src/utils/jwt.util", () => ({
+  generateToken: jest.fn().mockReturnValue("mock-jwt-token"),
+  verifyToken: jest.fn(),
+  getUserIdFromToken: jest.fn()
+}));
+
 // Mock de firebase-admin/firestore para Timestamp
 jest.mock("firebase-admin/firestore", () => {
   const mockTimestamp = {
@@ -93,14 +100,14 @@ describe("UserService", () => {
 
       const mockTimestamp = Timestamp.now();
 
-      const expectedNewUser: User = {
+      const createdUser: User = {
         id: "mocked-uuid",
         email: "new@example.com",
         createdAt: mockTimestamp,
       };
 
       mockUserRepository.findByEmail.mockResolvedValueOnce(null);
-      mockUserRepository.create.mockResolvedValueOnce(expectedNewUser);
+      mockUserRepository.create.mockResolvedValueOnce(createdUser);
 
       const result = await userService.createUser(createUserDto);
 
@@ -114,7 +121,12 @@ describe("UserService", () => {
           createdAt: mockTimestamp,
         })
       );
-      expect(result).toEqual(expectedNewUser);
+
+      // Verificar que el resultado tiene la estructura correcta con user y token
+      expect(result).toHaveProperty('user');
+      expect(result).toHaveProperty('token');
+      expect(result.user).toEqual(createdUser);
+      expect(result.token).toBe("mock-jwt-token");
     });
 
     it("debe lanzar error si el usuario ya existe", async () => {
@@ -157,7 +169,14 @@ describe("UserService", () => {
         "existing@example.com"
       );
       expect(mockUserRepository.create).not.toHaveBeenCalled();
-      expect(result).toEqual(existingUser);
+      
+      // Verificar la estructura completa del resultado
+      expect(result).toHaveProperty('user');
+      expect(result).toHaveProperty('token');
+      expect(result).toHaveProperty('isNewUser');
+      expect(result.user).toEqual(existingUser);
+      expect(result.token).toBe("mock-jwt-token");
+      expect(result.isNewUser).toBe(false);
     });
 
     it("debe crear un nuevo usuario si no existe", async () => {
@@ -184,7 +203,14 @@ describe("UserService", () => {
           createdAt: mockTimestamp,
         })
       );
-      expect(result).toEqual(createdUser);
+      
+      // Verificar la estructura completa del resultado
+      expect(result).toHaveProperty('user');
+      expect(result).toHaveProperty('token');
+      expect(result).toHaveProperty('isNewUser');
+      expect(result.user).toEqual(createdUser);
+      expect(result.token).toBe("mock-jwt-token");
+      expect(result.isNewUser).toBe(true);
     });
   });
 
@@ -219,6 +245,36 @@ describe("UserService", () => {
       await expect(userService.findById("user-id")).rejects.toThrow(
         "Database error"
       );
+    });
+  });
+
+  describe("authenticateUser", () => {
+    it("debe autenticar a un usuario existente y generar token", async () => {
+      const existingUser: User = {
+        id: "user-id-1",
+        email: "test@example.com",
+        createdAt: Timestamp.now(),
+      };
+
+      mockUserRepository.findByEmail.mockResolvedValueOnce(existingUser);
+
+      const result = await userService.authenticateUser("test@example.com");
+
+      expect(mockUserRepository.findByEmail).toHaveBeenCalledWith("test@example.com");
+      expect(result).toHaveProperty('user');
+      expect(result).toHaveProperty('token');
+      expect(result.user).toEqual(existingUser);
+      expect(result.token).toBe("mock-jwt-token");
+    });
+
+    it("debe lanzar error si el usuario no existe", async () => {
+      mockUserRepository.findByEmail.mockResolvedValueOnce(null);
+
+      await expect(userService.authenticateUser("nonexistent@example.com")).rejects.toThrow(
+        "Usuario no encontrado"
+      );
+
+      expect(mockUserRepository.findByEmail).toHaveBeenCalledWith("nonexistent@example.com");
     });
   });
 });
