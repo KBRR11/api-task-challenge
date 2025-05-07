@@ -11,7 +11,7 @@ const app:Express = express();
 
 // Middlewares
 app.use(helmet({contentSecurityPolicy: false})); // Seguridad
-app.use(cors()); // Permitir CORS
+app.use(cors({origin:process.env.FRONT_URL})); // Permitir CORS
 app.use(express.json()); // Parsear JSON
 
 // Rutas API - IMPORTANTE: No usar prefijo "/api/" aquí para los tests
